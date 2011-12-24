@@ -1,0 +1,34 @@
+
+(async/defpage-async "/request-map" {} conn
+  (async/respond conn good-response-map))
+
+(fact "page responses with maps are passed through to the channel"
+  (send-request "/request-map") => anything
+  (provided
+    (enqueue-and-close anything good-response-map) => truthy))
+
+(let [ws-body-call-count (atom 0)]
+  (async/defwebsocket "/websocket-open" {} conn
+    (swap! ws-body-call-count inc))
+
+  (facts "websocket opens should execute the defwebsocket body"
+    (send-request "/websocket-open") => anything
+    (deref ws-body-call-count) => 1))
+
+(let [mock-ch (channel)
+      ws-messages-recvd (atom [])
+      close-call-count (atom 0)]
+   
+  (async/defwebsocket "/websocket-receiver" {} conn
+      (async/on-receive conn (fn [msg] (swap! ws-messages-recvd conj msg)))
+      (async/on-close   conn (fn [] (swap! close-call-count inc)))
+      (async/send-message conn "ohai!"))
+
+  (send-request "/websocket-receiver")
+   
+  (fact "on-receive should trigger callback for all messages"
+    (do (enqueue mock-ch "amsg")
+        (some #{"amsg"} @ws-messages-recvd)) => truthy)
+  
+  (fact "on-close should be triggered when the channel closes"
+    (do (close mock-ch) @close-call-count) => 1))

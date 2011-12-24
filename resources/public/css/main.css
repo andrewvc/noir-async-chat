@@ -1,0 +1,51 @@
+body {
+  /*background: url('/images/rockywall.png');*/
+  background-color: #fff;
+}
+
+#container {
+  width: 760px;
+  margin: 0px auto;
+}
+ 
+a, a:visited {
+  color: #333;
+  font-weight: bold;
+  text-decoration:none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+header {
+  text-align: left;
+  font-size: 16px;
+  margin: 10px 0px;
+
+  color: #333;
+}
+
+#chatroom {
+  margin-top: 20px;
+}
+
+#chatroom-messages {
+  border: 1px dotted silver;
+  width: 100%;
+  height: 300px;
+  scroll: auto;
+}
+
+#chatroom-messages .handle {
+  font-weight: bold;
+}
+ 
+#chatroom-controls {
+  margin-top: 10px;
+}
+
+#chatroom-last-error {
+  color: red;
+  padding: 7px 0px;
+}
