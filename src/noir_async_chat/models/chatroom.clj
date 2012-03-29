@@ -34,7 +34,7 @@
   (enqueue chat-channel
     (json/generate-string
       {:mtype "all-handles"
-       :data @handles})))
+       :data (vec @handles)})))
 
 (set-interval 1000 broadcast-handles)
 

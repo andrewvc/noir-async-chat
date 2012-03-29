@@ -2,7 +2,7 @@
   (:require [noir-async-chat.views.common :as common]
             [noir-async-chat.models.chatroom :as room])
   (:use [noir.core :only [defpage]]
-        hiccup.form-helpers))
+        hiccup.form))
 
 (defpage "/" {}
     (common/layout 

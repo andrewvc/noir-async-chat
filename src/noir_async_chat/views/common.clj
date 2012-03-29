@@ -1,6 +1,7 @@
 (ns noir-async-chat.views.common
   (:use [noir.core :only [defpartial]]
-        [hiccup.page-helpers :only [include-css html5 include-js javascript-tag link-to]]))
+        [hiccup.page :only [include-css html5 include-js]]
+        [hiccup.element :only [javascript-tag link-to]]))
 
 (defpartial layout [& content]
   (html5

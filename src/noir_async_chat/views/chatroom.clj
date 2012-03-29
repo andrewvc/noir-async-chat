@@ -7,10 +7,10 @@
 (defn msg-set-handle [conn handle]
   (cond
     (room/add-user handle)
-      (send-message conn
+      (async-push conn
         (json/generate-string {:mtype "handle-set-succ" :data handle}))
     :else
-      (send-message conn
+      (async-push conn
         (json/generate-string {:mtype "handle-set-fail" :data handle}))))
    
 (defn msg-chat [handle text]
@@ -18,19 +18,19 @@
 
 (def ^:dynamic *conn-sess* nil)
 
-(defn dispatch-message [conn msg-raw]
+(defn dispatch-message [conn-sess conn msg-raw]
   (let [{:strs [mtype data]} (json/parse-string msg-raw)]
     (cond
       (= mtype "set-handle")
         (do 
           (msg-set-handle conn data)
-          (swap! *conn-sess* assoc :handle data))
+          (swap! conn-sess assoc :handle data))
       (= mtype "chat")
-        (msg-chat (@*conn-sess* :handle) data)
+        (msg-chat (@conn-sess :handle) data)
       :else
         (println (str "Unrecognized command: " msg-raw)))))
 
-(defwebsocket "/room" {} conn
+(defpage-async "/room" {} conn
   (room/subscribe-channel (:request-channel conn))
   (let [conn-sess (atom {})]
     (on-close conn (fn []
@@ -38,5 +38,6 @@
       (println (str "Conn closed"))))
     (on-receive conn
       (fn [msg]
-          (binding [*conn-sess* conn-sess]
-            (dispatch-message conn msg))))))
+        (println "Recvd" msg)
+        (dispatch-message conn-sess conn msg)
+            (async-push conn msg)))))

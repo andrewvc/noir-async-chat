@@ -7,8 +7,8 @@ window.log = function(){
 };
 
 $(function() {
-  var sock = window.roomSocket = new WebSocket("ws://localhost:3001/room");
-   
+  var sock = window.roomSocket = new WebSocket("ws://localhost:3000/room");
+
   function createMessage (mtype, data) {
     return JSON.stringify({mtype: mtype, data: data}); 
   }
@@ -31,6 +31,7 @@ $(function() {
 
   function showChat (msg) {
     var user = msg.handle;
+    if (!user) { return; }
     var text = msg.text
     var formatted = "<div class='chat-msg'>" + 
                       "<span class='handle'>" + msg.handle + "</span>" +
@@ -43,6 +44,10 @@ $(function() {
 
   sock.onopen = function (e) {
     $('#chatroom-controls').slideDown();
+  }
+
+  sock.onerror = function (e) {
+    alert("Websocket had an error!");
   }
 
   sock.onmessage = function (e) {
